@@ -21,6 +21,7 @@ var/
 *.egg
 
 # Virtual Environments
+.venv/
 venv/
 ENV/
 env/
@@ -67,6 +68,8 @@ two_tower.log
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# 
 
 # Project-specific
 # Add any other project-specific files you want to ignore 
