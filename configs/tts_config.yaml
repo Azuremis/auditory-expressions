@@ -1,0 +1,67 @@
+# Tiny TTS Configuration - Audio Week 5
+
+device: "cuda"                 # cuda / cpu / mps
+data_root: "./data/ljspeech"   # LJ Speech dataset
+
+# --- Feature parameters ----------------------------------------------------
+sample_rate: 22050             # Hz
+n_mels: 80                     # Number of mel bins
+window_ms: 50
+hop_ms: 12.5                   # 256 hop size at 22.05kHz
+fft_size: 1024
+win_length: 1024
+min_level_db: -100             # Minimum dB level
+ref_level_db: 20               # Reference dB level
+preemphasis: 0.97              # Pre-emphasis filter
+
+# --- TTS model parameters --------------------------------------------------
+tts:
+  # Tacotron-Lite (3M params)
+  tacotron_dim: 256            # Encoder/decoder dimensions
+  encoder_layers: 3            # Text encoder layers
+  decoder_layers: 2            # Mel decoder layers
+  attention_heads: 4           # Multi-head attention
+  attention_window: 3          # Local attention window
+  reduction_factor: 2          # Frame reduction factor
+  dropout: 0.1                 # Dropout rate
+  
+  # Text processing
+  phoneme_embedding_dim: 256   # Phoneme embedding dimension
+  use_g2p: true                # Use grapheme-to-phoneme
+  phoneme_dict: "cmudict"      # CMU pronunciation dictionary
+  
+  # Diffusion vocoder
+  diffusion:
+    vocoder_ckpt: "./checkpoints/diffusion_tiny.pt"  # Pre-trained vocoder
+    noise_steps: 25            # Diffusion steps at inference
+    beta_start: 0.0001         # Noise schedule start
+    beta_end: 0.02             # Noise schedule end
+    denoise_guidance: 2.5      # Classifier-free guidance scale
+    noise_schedule: "linear"   # Linear noise schedule
+
+# --- Training hyper-params -------------------------------------------------
+batch_size: 16
+epochs: 100                    # Train for many epochs
+weight_decay: 1.0e-6
+use_scheduler: true
+learning_rate: 1.0e-3          # Learning rate
+reduce_lr_patience: 5          # Reduce LR after patience epochs
+grad_clip_thresh: 1.0          # Gradient clipping threshold
+
+# --- Validation -------------------------------------------------------------
+validation:
+  test_sentences:              # Test sentences for evaluation
+    - "I live in Leeds but we're leaving tomorrow."
+    - "The cat sat on the mat."
+    - "How much wood would a woodchuck chuck if a woodchuck could chuck wood?"
+  eval_every: 1000             # Evaluate every N steps
+  
+# --- Logging ---------------------------------------------------------------
+wandb:
+  enable: true
+  project: "audio-week5"
+  group: "tiny-tts"
+  tags: ["tacotron", "diffusion"]
+  log_audio_examples: true
+
+checkpoints_dir: "./checkpoints/tts" 

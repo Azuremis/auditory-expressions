@@ -1,0 +1,47 @@
+# Music Transcription Configuration - Audio Week 5
+
+device: "cuda"                 # cuda / cpu / mps
+data_root: "./data/musicnet"
+
+# --- Feature parameters ----------------------------------------------------
+sample_rate: 22050             # Hz for resampling (orig 44.1kHz)
+n_mels: 128
+window_ms: 50
+hop_ms: 25
+
+# --- Music model parameters ------------------------------------------------
+music:
+  encoder_dim: 512
+  encoder_layers: 6            # More layers than default for music complexity
+  decoder_layers: 4            # For autoregressive note generation
+  seq_reduction: 8             # Pooled time reduction factor
+  lr: 1.0e-4
+  attention_heads: 8
+  
+  # Note token encoding
+  max_notes: 88                # Piano range
+  velocity_bins: 32            # Velocity quantization
+  duration_bins: 32            # Duration quantization
+  max_seq_len: 1024            # Maximum sequence length
+
+# --- Training hyper-params --------------------------------------------------
+batch_size: 16                 # Smaller due to sequence length
+epochs: 25
+weight_decay: 1.0e-4
+use_scheduler: true
+label_smoothing: 0.1           # Smoothing for classification
+gradient_clip: 1.0             # Prevent gradient explosion
+  
+# --- Data augmentation ------------------------------------------------------
+augment:
+  pitch_shift: true            # Random pitch shifts
+  time_stretch: true           # Random time stretching
+  spec_augment: true           # Spectrogram augmentation
+  
+# --- Logging ----------------------------------------------------------------
+wandb:
+  enable: true
+  project: "audio-week5"
+  group: "music-transcription"
+
+checkpoints_dir: "./checkpoints/music" 

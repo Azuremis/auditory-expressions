@@ -1,0 +1,46 @@
+# Default YAML configuration – Audio Week 5
+
+device: "cuda"                 # cuda / cpu / mps
+data_root: "./data"
+
+# --- Feature parameters ----------------------------------------------------
+sample_rate: 22050             # Hz
+n_mels: 128
+window_ms: 50
+hop_ms: 25
+
+# --- Task-specific blocks ---------------------------------------------------
+cnn:
+  model_name: "resnet18"
+  num_classes: 10
+  dropout: 0.3
+
+whisper:
+  checkpoint: "tiny.en"
+  lr: 1.0e-4
+  lora_rank: 8
+  freeze_encoder: true
+
+music:
+  encoder_dim: 512
+  encoder_layers: 4
+  seq_reduction: 8            # pooled time reduction factor
+  lr: 1.0e-4
+
+tts:
+  tacotron_dim: 256
+  vocoder_ckpt: "./checkpoints/diffusion_tiny.pt"
+
+# --- Training hyper-params --------------------------------------------------
+batch_size: 32
+epochs: 25
+weight_decay: 1.0e-4
+use_scheduler: true
+
+# --- Logging ----------------------------------------------------------------
+wandb:
+  enable: true
+  project: "audio-week5"
+  group: "default"
+
+checkpoints_dir: "./checkpoints" 

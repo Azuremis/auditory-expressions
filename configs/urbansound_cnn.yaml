@@ -1,0 +1,61 @@
+# UrbanSound8K CNN Classifier Configuration - Audio Week 5
+
+device: "cuda"                 # cuda / cpu / mps
+data_root: "./data/urbansound8k"
+
+# --- Feature parameters ----------------------------------------------------
+sample_rate: 22050             # Hz
+n_mels: 128                    # Number of mel bins
+window_ms: 50                  # Analysis window size
+hop_ms: 25                     # Hop size
+fft_size: 1024                 # FFT size for STFT
+
+# --- Model parameters ------------------------------------------------------
+cnn:
+  model_name: "resnet18"       # ResNet-18 backbone
+  num_classes: 10              # 10 classes in UrbanSound8K
+  dropout: 0.3                 # Dropout rate
+  pretrained: true             # Use ImageNet pre-trained weights
+  in_channels: 1               # Single channel for spectrograms
+  feature_dim: 512             # Feature dimension before classifier
+
+# --- Training hyper-params -------------------------------------------------
+batch_size: 32
+epochs: 30                     # Train for 30 epochs
+weight_decay: 1.0e-4
+use_scheduler: true
+learning_rate: 3.0e-4          # Learning rate
+scheduler_type: "cosine"       # Cosine annealing
+warmup_epochs: 2               # Learning rate warmup
+
+# --- Data augmentation -----------------------------------------------------
+augment:
+  spec_augment: true           # Spectrogram augmentation
+  time_masking: true           # Mask time bins
+  freq_masking: true           # Mask frequency bins
+  time_stretch: true           # Random time stretching (0.8-1.2x)
+  mixup: false                 # Mixup augmentation
+
+# --- Cross-validation setup ------------------------------------------------
+cv:
+  fold: 1                      # Test on fold 1 (1-10)
+  stratified: true             # Use stratified splits
+  
+# --- Evaluation metrics ----------------------------------------------------
+metrics:
+  accuracy: true               # Class accuracy
+  confusion_matrix: true       # Generate confusion matrix
+  f1_score: true               # F1 score (weighted)
+  per_class_accuracy: true     # Per-class accuracy
+
+# --- Logging ---------------------------------------------------------------
+wandb:
+  enable: true
+  project: "audio-week5"
+  group: "urbansound"
+  tags: ["resnet18", "task1"]
+  log_confusion_matrix: true
+  log_audio_examples: true
+
+checkpoints_dir: "./checkpoints/urbansound"
+model_card_path: "./artifacts/model_cards/urbansound_cnn.md" 

@@ -1,0 +1,54 @@
+# Whisper Fine-Tuning Experiment C - Audio Week 5
+# Low-Rank Adaptation (LoRA) approach for memory-efficient fine-tuning
+
+device: "cuda"                 # cuda / cpu / mps
+data_root: "./data/personalised"
+
+# --- Feature parameters ----------------------------------------------------
+sample_rate: 16000             # Hz - Whisper expects 16kHz
+n_mels: 80                     # Whisper uses 80 mel bins
+window_ms: 25
+hop_ms: 10
+
+# --- Whisper model parameters ----------------------------------------------
+whisper:
+  checkpoint: "tiny.en"        # Base whisper model to use
+  lr: 1.0e-4                   # Learning rate
+  lora_rank: 8                 # Key parameter for Experiment C
+  freeze_encoder: true         # Freeze encoder to avoid forgetting
+  target_modules:              # Apply LoRA to these modules
+    - "query"
+    - "value"
+  adapter_dropout: 0.05        # Dropout for adapter layers
+  
+  # Speaker prompt (for personalization)
+  use_speaker_prompt: false    # Will be true in Experiment D
+  speaker_embedding_dim: 256   # Embedding dimension for speaker token
+  
+  # Regularization to prevent catastrophic forgetting
+  weight_regularization: true  # Add regularization on weight drift
+  reg_alpha: 0.01              # Regularization strength
+
+# --- Training hyper-params --------------------------------------------------
+batch_size: 16
+accum_steps: 2                 # Effective batch size = batch_size * accum_steps
+epochs: 3                      # Few epochs to avoid overfitting
+weight_decay: 1.0e-5
+use_scheduler: true
+warmup_steps: 100              # Learning rate warmup
+eval_every: 500                # Evaluate every N steps
+
+# --- Evaluation metrics -----------------------------------------------------
+metrics:
+  wer_personalised: true       # Word Error Rate on personalized set
+  wer_general: true            # WER on general speech (to check degradation)
+  pairwise_edit_distance: true # For comparing before/after transcripts
+  
+# --- Logging ----------------------------------------------------------------
+wandb:
+  enable: true
+  project: "audio-week5"
+  group: "whisper_finetune"
+  tags: ["lora", "experiment-c"]
+
+checkpoints_dir: "./checkpoints/whisper" 
