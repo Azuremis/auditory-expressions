@@ -1,0 +1,39 @@
+# Whisper
+whisper
+
+# Core deep‑learning runtime
+torch
+torchaudio
+torchvision
+
+# Progress‑bar utility
+tqdm
+
+# Hugging Face libraries
+datasets
+transformers
+huggingface-hub
+
+# Audio processing
+librosa
+
+# Data analysis and visualization
+pandas
+numpy
+matplotlib
+seaborn
+
+# Experiment tracking
+wandb
+python-dotenv
+
+# Jupyter notebook
+jupyter
+ipywidgets
+
+# ChromaDB
+chromadb
+
+# FastAPI
+fastapi
+uvicorn
