@@ -1,14 +1,15 @@
 # UrbanSound8K CNN Classifier Configuration - Audio Week 5
 
-device: "cuda"                 # cuda / cpu / mps
+device: "cpu"                 # cuda / cpu / mps
 data_root: "./data/urbansound8k"
+use_huggingface: true          # Use HuggingFace dataset instead of local files
 
 # --- Feature parameters ----------------------------------------------------
 sample_rate: 22050             # Hz
 n_mels: 128                    # Number of mel bins
 window_ms: 50                  # Analysis window size
 hop_ms: 25                     # Hop size
-fft_size: 1024                 # FFT size for STFT
+fft_size: 2048                 # FFT size for STFT
 
 # --- Model parameters ------------------------------------------------------
 cnn:
@@ -38,7 +39,8 @@ augment:
 
 # --- Cross-validation setup ------------------------------------------------
 cv:
-  fold: 1                      # Test on fold 1 (1-10)
+  cross_validation: true       # Enable 10-fold cross-validation
+  folds: 10                    # Use all 10 folds
   stratified: true             # Use stratified splits
   
 # --- Evaluation metrics ----------------------------------------------------
@@ -50,7 +52,7 @@ metrics:
 
 # --- Logging ---------------------------------------------------------------
 wandb:
-  enable: true
+  enable: false
   project: "audio-week5"
   group: "urbansound"
   tags: ["resnet18", "task1"]
