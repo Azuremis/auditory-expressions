@@ -1,6 +1,6 @@
 # UrbanSound8K Transformer Classifier Configuration
 
-device: "cpu"                 # cuda / cpu / mps
+device: "cuda"                 # cuda / cpu / mps
 data_root: "./data/urbansound8k"
 use_huggingface: true          # Use HuggingFace dataset instead of local files
 
@@ -26,7 +26,7 @@ transformer:
 
 # --- Training hyper-params -------------------------------------------------
 batch_size: 32
-epochs: 30                     # Train for 30 epochs
+epochs: 1                     # Train for 30 epochs
 weight_decay: 1.0e-4
 use_scheduler: true
 learning_rate: 3.0e-4          # Learning rate
@@ -65,3 +65,4 @@ wandb:
 
 checkpoints_dir: "./checkpoints/urbansound"
 model_card_path: "./artifacts/model_cards/urbansound_transformer.md" 
+force_use_gpu: true            # Force using GPU/CUDA 

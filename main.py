@@ -61,6 +61,13 @@ def main():
             
             # Parse remaining args and call the function
             urbansound_args = urbansound_parser.parse_args(remaining)
+            
+            # Check if args.config is provided and override the parser's default
+            if args.config:
+                urbansound_args.config = args.config
+                logger.info(f"Using configuration file from main args: {args.config}")
+            
+            logger.info(f"Training UrbanSound with config: {urbansound_args.config}")
             train_urbansound(urbansound_args)
             
         elif args.task == 'whisper':

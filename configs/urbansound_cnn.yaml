@@ -1,6 +1,6 @@
 # UrbanSound8K CNN Classifier Configuration - Audio Week 5
 
-device: "cpu"                 # cuda / cpu / mps
+device: "cuda"                 # cuda / cpu / mps
 data_root: "./data/urbansound8k"
 use_huggingface: true          # Use HuggingFace dataset instead of local files
 

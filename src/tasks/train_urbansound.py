@@ -74,6 +74,8 @@ def load_config(config_path: str) -> Dict:
     """
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
+    logger.info(f"Loaded config from {config_path}")
+    logger.info(f"Config model_type: {config.get('model_type', 'not specified')}")
     return config
 
 def create_data_loaders(config: Dict, test_fold: int = 1) -> Tuple[DataLoader, DataLoader]:
@@ -156,7 +158,10 @@ def create_model(config: Dict, device: torch.device) -> nn.Module:
     Returns:
         Initialized model
     """
+    logger.info(f"Config keys available: {list(config.keys())}")
+    
     model_type = config.get('model_type', 'cnn')
+    logger.info(f"Creating model of type: {model_type}")
     
     if model_type == 'cnn':
         model_config = config.get('cnn', {})
@@ -497,6 +502,8 @@ def train_single_fold(
     Returns:
         Dictionary of validation metrics for the fold
     """
+    logger.info(f"train_single_fold - Config model_type: {config.get('model_type', 'not specified')}")
+    
     fold_dir = os.path.join(output_dir, f"fold_{fold}")
     os.makedirs(fold_dir, exist_ok=True)
     
@@ -624,7 +631,11 @@ def main(args):
         yaml.dump(config, f)
     
     # Set device
-    device_str = config.get('device', 'cuda' if torch.cuda.is_available() else 'cpu')
+    force_use_gpu = config.get('force_use_gpu', False)
+    if force_use_gpu and torch.cuda.is_available():
+        device_str = 'cuda'
+    else:
+        device_str = config.get('device', 'cuda' if torch.cuda.is_available() else 'cpu')
     device = torch.device(device_str)
     logger.info(f"Using device: {device}")
     
