@@ -1,0 +1,67 @@
+# UrbanSound8K Transformer Classifier Configuration
+
+device: "cpu"                 # cuda / cpu / mps
+data_root: "./data/urbansound8k"
+use_huggingface: true          # Use HuggingFace dataset instead of local files
+
+# --- Feature parameters ----------------------------------------------------
+sample_rate: 22050             # Hz
+n_mels: 128                    # Number of mel bins
+window_ms: 50                  # Analysis window size
+hop_ms: 25                     # Hop size
+fft_size: 2048                 # FFT size for STFT
+
+# --- Model parameters ------------------------------------------------------
+model_type: "transformer"      # Model type (cnn or transformer)
+transformer:
+  input_dim: 128               # Input dimension (n_mels for spectrogram)
+  conv_channels: 128           # Channels in 1D convolution
+  transformer_dim: 256         # Transformer model dimension
+  nhead: 8                     # Number of attention heads
+  num_encoder_layers: 4        # Number of transformer encoder layers
+  dim_feedforward: 1024        # Feedforward dimension in transformer
+  dropout: 0.3                 # Dropout rate
+  num_classes: 10              # 10 classes in UrbanSound8K
+  input_is_spectrogram: true   # Using spectrograms vs raw audio
+
+# --- Training hyper-params -------------------------------------------------
+batch_size: 32
+epochs: 30                     # Train for 30 epochs
+weight_decay: 1.0e-4
+use_scheduler: true
+learning_rate: 3.0e-4          # Learning rate
+scheduler_type: "cosine"       # Cosine annealing
+warmup_epochs: 2               # Learning rate warmup
+
+# --- Data augmentation -----------------------------------------------------
+augment:
+  spec_augment: true           # Spectrogram augmentation
+  time_masking: true           # Mask time bins
+  freq_masking: true           # Mask frequency bins
+  time_stretch: true           # Random time stretching (0.8-1.2x)
+  mixup: false                 # Mixup augmentation
+
+# --- Cross-validation setup ------------------------------------------------
+cv:
+  cross_validation: true       # Enable 10-fold cross-validation
+  folds: 10                    # Use all 10 folds
+  stratified: true             # Use stratified splits
+  
+# --- Evaluation metrics ----------------------------------------------------
+metrics:
+  accuracy: true               # Class accuracy
+  confusion_matrix: true       # Generate confusion matrix
+  f1_score: true               # F1 score (weighted)
+  per_class_accuracy: true     # Per-class accuracy
+
+# --- Logging ---------------------------------------------------------------
+wandb:
+  enable: false
+  project: "audio-week5"
+  group: "urbansound-transformer"
+  tags: ["transformer", "task1"]
+  log_confusion_matrix: true
+  log_audio_examples: true
+
+checkpoints_dir: "./checkpoints/urbansound"
+model_card_path: "./artifacts/model_cards/urbansound_transformer.md" 
