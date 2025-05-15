@@ -6,6 +6,8 @@ REPO_NAME="auditory-expressions"
 REPO_URL="https://github.com/Azuremis/auditory-expressions.git"
 PYTHON_VERSION="3.10"
 PROJECT_DIR="$HOME/$REPO_NAME"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_FILE="$SCRIPT_DIR/.env"
 
 # Check if uv is installed, if not install it
 if ! command -v uv &> /dev/null; then
@@ -42,11 +44,28 @@ fi
 cd "$PROJECT_DIR"
 
 # Load environment variables from .env file
-if [ -f ".env" ]; then
-    echo "Loading environment variables from .env file..."
-    export $(grep -v '^#' .env | xargs)
+if [ -f "$ENV_FILE" ]; then
+    echo "Loading environment variables from $ENV_FILE..."
+    # This method properly handles special characters and spaces in values
+    while IFS= read -r line || [ -n "$line" ]; do
+        # Skip comments and empty lines
+        [[ $line =~ ^[[:space:]]*$ || $line =~ ^# ]] && continue
+        # Remove quotes and export the variable
+        eval "export $(echo "$line" | sed -e 's/[[:space:]]*$//' -e 's/#.*$//')"
+    done < "$ENV_FILE"
 else
-    echo "Warning: .env file not found! Please create one with WANDB_API_KEY, GIT_USER, and GIT_EMAIL."
+    echo "ERROR: .env file not found at $ENV_FILE!"
+    echo "Please create an .env file with the following variables:"
+    echo "  WANDB_API_KEY=your_wandb_api_key"
+    echo "  GIT_USER=your_git_username"
+    echo "  GIT_EMAIL=your_git_email"
+    exit 1
+fi
+
+# Validate required environment variables
+if [ -z "$WANDB_API_KEY" ] || [ -z "$GIT_USER" ] || [ -z "$GIT_EMAIL" ]; then
+    echo "ERROR: One or more required environment variables are missing in $ENV_FILE"
+    echo "Please ensure WANDB_API_KEY, GIT_USER, and GIT_EMAIL are defined."
     exit 1
 fi
 
@@ -75,13 +94,10 @@ else
     uv sync
 fi
 
-# No need to run `uv pip install -e .` as uv sync already installs the project in editable mode by default
-
 # Login to wandb using API key from .env
 echo "Logging in to Weights & Biases..."
 source .venv/bin/activate
 wandb login "$WANDB_API_KEY"
-# Keep the environment activated, don't deactivate here
 
 echo "Setup complete! The environment is ready and activated."
 # Activate the environment so it's immediately available
