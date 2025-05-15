@@ -1,0 +1,83 @@
+#!/bin/bash
+set -e  # Exit on error
+
+# Configuration variables
+REPO_NAME="auditory-expressions"
+REPO_URL="https://github.com/Azuremis/auditory-expressions.git"
+PYTHON_VERSION="3.10"
+PROJECT_DIR="$HOME/$REPO_NAME"
+
+# Check if uv is installed, if not install it
+if ! command -v uv &> /dev/null; then
+    echo "UV not found. Installing UV..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    
+    # Add uv to the PATH for the current session
+    export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
+# Check if the project exists, if not clone it
+if [ ! -d "$PROJECT_DIR" ]; then
+    echo "Cloning $REPO_NAME repository from $REPO_URL..."
+    git clone "$REPO_URL" "$PROJECT_DIR"
+else
+    echo "$REPO_NAME repository already exists at $PROJECT_DIR."
+fi
+
+# Change to project directory
+cd "$PROJECT_DIR"
+
+# Load environment variables from .env file
+if [ -f ".env" ]; then
+    echo "Loading environment variables from .env file..."
+    export $(grep -v '^#' .env | xargs)
+else
+    echo "Warning: .env file not found! Please create one with WANDB_API_KEY, GIT_USER, and GIT_EMAIL."
+    exit 1
+fi
+
+# Configure Git credentials using values from .env
+echo "Setting up Git configuration..."
+git config --global user.name "$GIT_USER"
+git config --global user.email "$GIT_EMAIL"
+
+# Check if Python version is available, install if needed
+if ! uv python list | grep -q "Python $PYTHON_VERSION"; then
+    echo "Installing Python $PYTHON_VERSION using UV..."
+    uv python install $PYTHON_VERSION
+fi
+
+# Pin the Python version for this project
+echo "Setting Python version for the project..."
+uv python pin $PYTHON_VERSION
+
+# Create and sync virtual environment from pyproject.toml
+echo "Creating virtual environment and installing dependencies from pyproject.toml..."
+if [ -f "uv.lock" ]; then
+    echo "Using existing lockfile for reproducible environment..."
+    uv sync --frozen
+else
+    echo "Creating new lockfile from pyproject.toml..."
+    uv sync
+fi
+
+# Install PyTorch with CUDA support (if needed)
+if ! grep -q "torch.*cu" .venv/lib/python*/site-packages/torch/version.py 2>/dev/null; then
+    echo "Installing PyTorch with CUDA support..."
+    source .venv/bin/activate
+    pip uninstall -y torch
+    pip install torch==2.7.0+cu121 -f https://download.pytorch.org/whl/cu121/torch_stable.html
+    deactivate
+fi
+
+# No need to run `uv pip install -e .` as uv sync already installs the project in editable mode by default
+
+# Login to wandb using API key from .env
+echo "Logging in to Weights & Biases..."
+source .venv/bin/activate
+wandb login "$WANDB_API_KEY"
+# Keep the environment activated, don't deactivate here
+
+echo "Setup complete! The environment is ready and activated."
+# Activate the environment so it's immediately available
+source $PROJECT_DIR/.venv/bin/activate

@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+You should always use the .venv or venv environment that has been setup using uv. Never install anything to base python
