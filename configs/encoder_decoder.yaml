@@ -41,7 +41,7 @@ augment:
 # --- Logging ----------------------------------------------------------------
 wandb:
   enable: true
-  project: "audio-week5"
+  project: "auditory-expressions"
   group: "music-transcription"
 
 checkpoints_dir: "./checkpoints/music" 

@@ -47,7 +47,7 @@ metrics:
 # --- Logging ----------------------------------------------------------------
 wandb:
   enable: true
-  project: "audio-week5"
+  project: "auditory-expressions"
   group: "whisper_finetune"
   tags: ["lora", "experiment-c"]
 

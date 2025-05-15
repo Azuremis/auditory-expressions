@@ -56,8 +56,8 @@ metrics:
 
 # --- Logging ---------------------------------------------------------------
 wandb:
-  enable: false
-  project: "audio-week5"
+  enable: true
+  project: "auditory-expressions"
   group: "urbansound-transformer"
   tags: ["transformer", "task1"]
   log_confusion_matrix: true

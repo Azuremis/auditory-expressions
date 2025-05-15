@@ -59,7 +59,7 @@ validation:
 # --- Logging ---------------------------------------------------------------
 wandb:
   enable: true
-  project: "audio-week5"
+  project: "auditory-expressions"
   group: "tiny-tts"
   tags: ["tacotron", "diffusion"]
   log_audio_examples: true

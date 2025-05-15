@@ -22,7 +22,7 @@ cnn:
 
 # --- Training hyper-params -------------------------------------------------
 batch_size: 32
-epochs: 30                     # Train for 30 epochs
+epochs: 5                     # Train for 30 epochs
 weight_decay: 1.0e-4
 use_scheduler: true
 learning_rate: 3.0e-4          # Learning rate
@@ -52,8 +52,8 @@ metrics:
 
 # --- Logging ---------------------------------------------------------------
 wandb:
-  enable: false
-  project: "audio-week5"
+  enable: true
+  project: "auditory-expressions"
   group: "urbansound"
   tags: ["resnet18", "task1"]
   log_confusion_matrix: true

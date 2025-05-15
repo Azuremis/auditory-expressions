@@ -40,7 +40,7 @@ use_scheduler: true
 # --- Logging ----------------------------------------------------------------
 wandb:
   enable: true
-  project: "audio-week5"
+  project: "auditory-expressions"
   group: "default"
 
 checkpoints_dir: "./checkpoints" 
