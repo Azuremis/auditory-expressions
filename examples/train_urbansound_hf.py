@@ -23,6 +23,8 @@ def main():
     # Modified argument description to discourage overriding cross-validation
     parser.add_argument('--fold', type=int, default=None,
                         help='DEPRECATED: Single fold evaluation is not recommended by dataset creators')
+    parser.add_argument('--disable_wandb', action='store_true',
+                        help='Disable Weights & Biases tracking')
     
     args = parser.parse_args()
     
@@ -48,6 +50,21 @@ def main():
             config['cv'] = {}
         config['cv']['cross_validation'] = True
         config['cv']['folds'] = 10
+    
+    # Enable WandB by default
+    if 'wandb' not in config:
+        config['wandb'] = {}
+    
+    # Enable WandB unless explicitly disabled
+    if not args.disable_wandb:
+        config['wandb']['enable'] = True
+        config['wandb']['project'] = config['wandb'].get('project', 'urbansound-classification')
+        config['wandb']['group'] = config['wandb'].get('group', 'urbansound')
+        config['wandb']['log_confusion_matrix'] = True
+        print("Weights & Biases tracking enabled. Use --disable_wandb to disable.")
+    else:
+        config['wandb']['enable'] = False
+        print("Weights & Biases tracking disabled.")
     
     # Save the modified config to a temporary file
     import tempfile
