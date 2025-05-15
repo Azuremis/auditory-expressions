@@ -13,7 +13,21 @@ if ! command -v uv &> /dev/null; then
     curl -LsSf https://astral.sh/uv/install.sh | sh
     
     # Add uv to the PATH for the current session
-    export PATH="$HOME/.cargo/bin:$PATH"
+    export PATH="$HOME/.local/bin:$PATH"
+    
+    # Source the environment file if it exists
+    if [ -f "$HOME/.local/bin/env" ]; then
+        echo "Sourcing UV environment..."
+        source "$HOME/.local/bin/env"
+    fi
+    
+    # Verify uv is now in PATH
+    if ! command -v uv &> /dev/null; then
+        echo "ERROR: UV installation succeeded but command not found in PATH."
+        echo "Please run the following command and then run this script again:"
+        echo "    source \$HOME/.local/bin/env"
+        exit 1
+    fi
 fi
 
 # Check if the project exists, if not clone it
@@ -59,15 +73,6 @@ if [ -f "uv.lock" ]; then
 else
     echo "Creating new lockfile from pyproject.toml..."
     uv sync
-fi
-
-# Install PyTorch with CUDA support (if needed)
-if ! grep -q "torch.*cu" .venv/lib/python*/site-packages/torch/version.py 2>/dev/null; then
-    echo "Installing PyTorch with CUDA support..."
-    source .venv/bin/activate
-    pip uninstall -y torch
-    pip install torch==2.7.0+cu121 -f https://download.pytorch.org/whl/cu121/torch_stable.html
-    deactivate
 fi
 
 # No need to run `uv pip install -e .` as uv sync already installs the project in editable mode by default
