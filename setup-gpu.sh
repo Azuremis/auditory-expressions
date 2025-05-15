@@ -99,6 +99,12 @@ echo "Logging in to Weights & Biases..."
 source .venv/bin/activate
 wandb login "$WANDB_API_KEY"
 
-echo "Setup complete! The environment is ready and activated."
-# Activate the environment so it's immediately available
-source $PROJECT_DIR/.venv/bin/activate
+# The script can't permanently activate the environment in your shell
+echo ""
+echo "======================= SETUP COMPLETE ======================="
+echo "The environment has been set up at: $PROJECT_DIR/.venv"
+echo ""
+echo "To activate the environment, please run:"
+echo "    cd $PROJECT_DIR && source .venv/bin/activate"
+echo ""
+echo "============================================================="
